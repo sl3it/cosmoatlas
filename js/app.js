@@ -1,24 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
   AOS?.init();
 
+  // Header scroll effect
+  const header = document.querySelector('.site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  });
+
   // Video background is used instead of particles.js
 
   // Parallax effect on mouse move
+  // Parallax effect on mouse move
   const hero = document.querySelector('.hero');
   const heroInner = document.querySelector('.hero-inner');
-  const apod = document.querySelector('.apod');
-  if (hero && heroInner && apod) {
+  if (hero && heroInner) {
     hero.addEventListener('mousemove', (ev) => {
       const r = hero.getBoundingClientRect();
       const x = (ev.clientX - r.left) / r.width - 0.5; // -0.5..0.5
       const y = (ev.clientY - r.top) / r.height - 0.5;
       const tx = x * 12; const ty = y * 8;
       heroInner.style.transform = `translate3d(${-tx}px, ${-ty}px, 0) scale(1.01)`;
-      apod.style.transform = `translate3d(${tx / 1.6}px, ${ty / 1.4}px, 0)`;
     });
     hero.addEventListener('mouseleave', () => {
       heroInner.style.transform = '';
-      apod.style.transform = '';
     });
   }
 
@@ -132,6 +137,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   loadHomePreview();
+
+  // Facts
+  const FACTS = [
+    "На Сатурне могут идти дожди из алмазов.",
+    "Один день на Венере длится дольше, чем год.",
+    "Юпитер настолько велик, что все остальные планеты поместились бы внутри.",
+    "Следы астронавтов на Луне останутся там миллионы лет.",
+    "Солнце составляет 99.86% массы всей Солнечной системы."
+  ];
+  const factCard = document.querySelector('#did-you-know p');
+  const factBtn = document.querySelector('#did-you-know a');
+
+  if (factCard && factBtn) {
+    let factIndex = 0;
+
+    factBtn.onclick = (e) => {
+      e.preventDefault();
+      // Increment index and cycle back to 0 if we exceed length
+      factIndex = (factIndex + 1) % FACTS.length;
+      const nextFact = FACTS[factIndex];
+
+      factCard.style.opacity = 0;
+      setTimeout(() => {
+        factCard.textContent = nextFact;
+        factCard.style.opacity = 1;
+      }, 200);
+    }
+  }
 
   // Planet of the week: choose a planet deterministically by week number
   async function setPlanetOfWeek() {
