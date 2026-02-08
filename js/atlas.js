@@ -13,16 +13,26 @@ function renderAtlas(list){
       uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
       neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
     };
+    const REMOTE_PLANET_THUMBS = {
+      mercury: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/800px-Mercury_in_true_color.jpg',
+      venus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/400px-Venus-real_color.jpg',
+      earth: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Earth_Eastern_Hemisphere.jpg/400px-Earth_Eastern_Hemisphere.jpg',
+      mars: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/400px-OSIRIS_Mars_true_color.jpg',
+      jupiter: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter.jpg/400px-Jupiter.jpg',
+      saturn: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/400px-Saturn_during_Equinox.jpg',
+      uranus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/400px-Uranus2.jpg',
+      neptune: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/400px-Neptune_Full.jpg'
+    };
     const card = document.createElement('a');
     card.className = 'planet-card';
     card.href = `planet.html?id=${p.id}`;
     // fallback image URL (generated placeholder matching planet color)
     const fallback = `https://placehold.co/400x400/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
-      const remote = REMOTE_PLANET_IMAGES[p.id] || fallback;
+      const thumb = REMOTE_PLANET_THUMBS[p.id] || REMOTE_PLANET_IMAGES[p.id] || fallback;
       card.innerHTML = `
         <div style="height:110px;display:flex;align-items:center;justify-content:center;position:relative">
           <div class="planet-bubble" style="background:${p.color}"></div>
-          <img class="planet-thumb" src="${remote}" alt="${p.name}" data-fallback="${fallback}" onerror="this.onerror=null;this.src=this.dataset.fallback">
+          <img class="planet-thumb" src="${thumb}" alt="${p.name}" loading="lazy" decoding="async" data-fallback="${fallback}" onerror="this.onerror=null;this.src=this.dataset.fallback">
         </div>
         <div class="planet-name">${p.name}</div>
         <div class="planet-meta">${p.type} • ${p.distance} млн км</div>`;

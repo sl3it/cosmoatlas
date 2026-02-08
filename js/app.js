@@ -95,16 +95,29 @@ document.addEventListener('DOMContentLoaded',()=>{
         uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
         neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
       };
+      // smaller thumb variants to reduce bandwidth on previews
+      const REMOTE_PLANET_THUMBS = {
+        // try a slightly larger thumb first (800px) then 400px as fallback
+        mercury: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/800px-Mercury_in_true_color.jpg',
+        venus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/400px-Venus-real_color.jpg',
+        earth: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Earth_Eastern_Hemisphere.jpg/400px-Earth_Eastern_Hemisphere.jpg',
+        mars: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/400px-OSIRIS_Mars_true_color.jpg',
+        jupiter: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter.jpg/400px-Jupiter.jpg',
+        saturn: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/400px-Saturn_during_Equinox.jpg',
+        uranus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/400px-Uranus2.jpg',
+        neptune: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/400px-Neptune_Full.jpg'
+      };
+
       sample.forEach(p=>{
         const el = document.createElement('a');
         el.className = 'preview-card';
         el.href = `planet.html?id=${p.id}`;
         const fallback = `https://placehold.co/200x200/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
-        const remote = REMOTE_PLANET_IMAGES[p.id] || fallback;
+        const thumb = REMOTE_PLANET_THUMBS[p.id] || REMOTE_PLANET_IMAGES[p.id] || fallback;
         el.innerHTML = `
           <div style="position:relative;display:flex;align-items:center;justify-content:center;height:88px;width:88px">
             <div class=\"bubble\" style=\"background:${p.color}\"></div>
-            <img class=\"planet-thumb small\" src=\"${remote}\" alt=\"${p.name}\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
+            <img class=\"planet-thumb small\" src=\"${thumb}\" alt=\"${p.name}\" loading=\"lazy\" decoding=\"async\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
           </div>
           <div class=\"pname\">${p.name}</div>
           <div class=\"pmeta\">${p.type} • ${p.distance} млн км</div>`;
@@ -139,24 +152,28 @@ document.addEventListener('DOMContentLoaded',()=>{
       const thumb = card.querySelector('.planet-week-img');
       if(thumb){
         const local = `assets/images/${p.id}.jpg`;
-        const remoteMap = {
-          mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
-          venus: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg',
-          earth: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg',
-          mars: 'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
-          jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
-          saturn: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg',
-          uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
-          neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
+        const REMOTE_PLANET_THUMBS = {
+          mercury: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/800px-Mercury_in_true_color.jpg',
+          venus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/400px-Venus-real_color.jpg',
+          earth: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Earth_Eastern_Hemisphere.jpg/400px-Earth_Eastern_Hemisphere.jpg',
+          mars: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/400px-OSIRIS_Mars_true_color.jpg',
+          jupiter: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter.jpg/400px-Jupiter.jpg',
+          saturn: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/400px-Saturn_during_Equinox.jpg',
+          uranus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/400px-Uranus2.jpg',
+          neptune: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/400px-Neptune_Full.jpg'
         };
         const placeholder = `https://placehold.co/400x400/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
         thumb.alt = p.name;
-        // first try local, on error try remoteMap, then placeholder
+        // Try local first, then thumbnail remote, then full remote, then placeholder
         thumb.src = local;
+        thumb.loading = 'lazy';
         thumb.onerror = function handler(){
           this.onerror = null;
-          if(remoteMap[p.id]){
-            this.src = remoteMap[p.id];
+          if(REMOTE_PLANET_THUMBS[p.id]){
+            this.src = REMOTE_PLANET_THUMBS[p.id];
+            this.onerror = function(){ this.onerror = null; this.src = (REMOTE_PLANET_THUMBS[p.id]||placeholder); };
+          } else if (typeof REMOTE_PLANET_IMAGES !== 'undefined' && REMOTE_PLANET_IMAGES[p.id]){
+            this.src = REMOTE_PLANET_IMAGES[p.id];
             this.onerror = function(){ this.onerror = null; this.src = placeholder; };
           } else {
             this.src = placeholder;

@@ -47,18 +47,27 @@ async function initPlanet(){
   let material = new THREE.MeshStandardMaterial({color: p.color || '#888', metalness:0.0, roughness:0.7});
   // prepare candidate texture URLs: prefer curated remote textures, then placeholder (no local files required)
   const remoteMap = {
-    earth: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg',
-    mars: 'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
-    jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
-    saturn: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg',
-    mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
-    venus: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg',
-    uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
-    neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
+    earth: ['https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg'],
+    mars: ['https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg'],
+    jupiter: ['https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg'],
+    saturn: ['https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg'],
+    // try multiple mercury variants (thumb and full) to improve chance of loading
+    mercury: [
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/800px-Mercury_in_true_color.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/400px-Mercury_in_true_color.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg'
+    ],
+    venus: ['https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg'],
+    uranus: ['https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg'],
+    neptune: ['https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg']
   };
   const placeholder = `https://placehold.co/1024x1024/${(p.color||'#444').replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
   const candidates = [];
-  if(remoteMap[p.id]) candidates.push(remoteMap[p.id]);
+  if(remoteMap[p.id]){
+    // remoteMap entries are arrays of candidate URLs
+    const arr = Array.isArray(remoteMap[p.id]) ? remoteMap[p.id] : [remoteMap[p.id]];
+    for(const u of arr) candidates.push(u);
+  }
   candidates.push(placeholder);
 
   let textureLoaded = false;
