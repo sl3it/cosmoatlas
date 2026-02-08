@@ -96,15 +96,29 @@ async function initPlanet(){
   const atmMesh = new THREE.Mesh(atmGeo, atmMat);
   scene.add(atmMesh);
 
-    camera.position.z = 2.6;
+    // handle resize and frame the sphere so it stays centered and fully visible
+    function frameCamera(){
+      const fov = camera.fov * (Math.PI/180);
+      // distance needed to fully frame a unit sphere with some padding
+      const distance = 1.15 / Math.tan(fov/2);
+      camera.position.set(0, 0, distance);
+      camera.lookAt(0,0,0);
+    }
+
+    // initial camera frame
+    frameCamera();
 
     // handle resize
     function resize(){
       const w = mount.clientWidth || window.innerWidth;
       const h = mount.clientHeight || 420;
-      renderer.setSize(w, h);
+      // update renderer and ensure DOM element fills the container
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
       camera.aspect = w / Math.max(1, h);
       camera.updateProjectionMatrix();
+      frameCamera();
     }
   window.addEventListener('resize', resize);
   resize();
