@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
   AOS?.init();
 
   // Video background is used instead of particles.js
@@ -7,16 +7,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   const hero = document.querySelector('.hero');
   const heroInner = document.querySelector('.hero-inner');
   const apod = document.querySelector('.apod');
-  if(hero && heroInner && apod){
-    hero.addEventListener('mousemove', (ev)=>{
+  if (hero && heroInner && apod) {
+    hero.addEventListener('mousemove', (ev) => {
       const r = hero.getBoundingClientRect();
       const x = (ev.clientX - r.left) / r.width - 0.5; // -0.5..0.5
       const y = (ev.clientY - r.top) / r.height - 0.5;
       const tx = x * 12; const ty = y * 8;
-      heroInner.style.transform = `translate3d(${ -tx }px, ${ -ty }px, 0) scale(1.01)`;
-      apod.style.transform = `translate3d(${ tx/1.6 }px, ${ ty/1.4 }px, 0)`;
+      heroInner.style.transform = `translate3d(${-tx}px, ${-ty}px, 0) scale(1.01)`;
+      apod.style.transform = `translate3d(${tx / 1.6}px, ${ty / 1.4}px, 0)`;
     });
-    hero.addEventListener('mouseleave', ()=>{
+    hero.addEventListener('mouseleave', () => {
       heroInner.style.transform = '';
       apod.style.transform = '';
     });
@@ -24,66 +24,89 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // Fetch NASA APOD (demo key allowed)
   const apodInner = document.getElementById('apod-inner');
-  if(apodInner){
+  if (apodInner) {
     const nasaUrl = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY';
-    const showFallback = (msg)=>{
+
+    const showFallback = (msg) => {
       apodInner.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-          <svg width="240" height="140" viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="240" height="140" rx="8" fill="#071024"/><g fill="#3aa0ff" opacity="0.12"><circle cx="40" cy="40" r="28"/><circle cx="120" cy="60" r="18"/><circle cx="190" cy="28" r="12"/></g><text x="50%" y="78%" text-anchor="middle" fill="#cbd5e1" font-size="12">APOD недоступен</text></svg>
-          <div style="color:var(--muted);font-size:13px;text-align:center">${msg}<br><a href="https://apod.nasa.gov" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Открыть APOD на сайте NASA</a></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px;text-align:center">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#cbd5e1" opacity="0.5"/></svg>
+          <div style="color:var(--muted);font-size:14px;">${msg}</div>
+          <a href="https://apod.nasa.gov" target="_blank" rel="noopener" class="btn ghost" style="margin-top:8px;font-size:13px">Открыть сайт NASA APOD</a>
         </div>`;
     };
 
-    async function tryFetch(){
-      try{
-        const r = await fetch(nasaUrl);
-        if(!r.ok) throw new Error('status '+r.status);
-        const data = await r.json();
-        if(data.url && data.media_type!=='video'){
-          apodInner.innerHTML = `<img alt="${data.title}" src="${data.url}"><p style=\"color:var(--muted);font-size:13px;margin-top:8px\">${data.title}</p>`;
-          return;
-        } else if(data.media_type==='video'){
-          apodInner.innerHTML = `<a href="${data.url}" target=_blank rel=noopener>Открыть видео APOD</a>`;
-          return;
+    async function tryFetch() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+      try {
+        const r = await fetch(nasaUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!r.ok) {
+          if (r.status === 429) throw new Error('Too Many Requests (API Limit)');
+          throw new Error(`HTTP Error ${r.status}`);
         }
-        throw new Error('no media');
-      }catch(e){
-        // Try proxy to avoid CORS/file:// restrictions
-        try{
+
+        const data = await r.json();
+        if (!data) throw new Error('No data received');
+
+        if (data.media_type === 'image' && data.url) {
+          apodInner.innerHTML = `
+            <img alt="${data.title || 'NASA APOD'}" src="${data.url}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent, rgba(0,0,0,0.8));border-radius:0 0 8px 8px;pointer-events:none">
+              <p style="color:#fff;font-size:13px;margin:0;font-weight:500">${data.title}</p>
+            </div>`;
+        } else if (data.media_type === 'video' && data.url) {
+          apodInner.innerHTML = `
+             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px">
+                <span style="font-size:32px">🎥</span>
+                <p style="color:var(--muted);font-size:13px;text-align:center">${data.title}</p>
+                <a href="${data.url}" target="_blank" rel="noopener" class="btn ghost">Смотреть видео</a>
+             </div>`;
+        } else {
+          throw new Error('Unsupported media type');
+        }
+
+      } catch (e) {
+        clearTimeout(timeoutId);
+        console.warn('APOD fetch primary failed:', e);
+
+        // Proxy Fallback
+        try {
           const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(nasaUrl);
           const pr = await fetch(proxy);
-          if(!pr.ok) throw new Error('proxy status '+pr.status);
-          const pdata = await pr.json();
-          if(pdata.url && pdata.media_type!=='video'){
-            apodInner.innerHTML = `<img alt="${pdata.title}" src="${pdata.url}"><p style=\"color:var(--muted);font-size:13px;margin-top:8px\">${pdata.title}</p>`;
-            return;
-          } else if(pdata.media_type==='video'){
-            apodInner.innerHTML = `<a href="${pdata.url}" target=_blank rel=noopener>Открыть видео APOD</a>`;
-            return;
+          if (!pr.ok) throw new Error('Proxy error');
+          const data = await pr.json();
+
+          if (data.media_type === 'image' && data.url) {
+            apodInner.innerHTML = `<img alt="${data.title}" src="${data.url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
+          } else {
+            throw new Error('Proxy no image');
           }
-          throw new Error('proxy no media');
-        }catch(err){
-          console.warn('APOD fetch failed, falling back',e,err);
-          showFallback('Не удалось загрузить APOD — возможно проблема с сетью или CORS.');
+        } catch (err2) {
+          console.error('APOD fallback failed:', err2);
+          showFallback('Не удалось загрузить фото дня. Проверьте соединение.');
         }
       }
     }
     tryFetch();
   }
   // Home preview: show first few planets from data
-  async function loadHomePreview(){
+  async function loadHomePreview() {
     const grid = document.getElementById('preview-grid');
-    if(!grid) return;
-    try{
+    if (!grid) return;
+    try {
       let arr;
-      try{
+      try {
         const res = await fetch('data/planets.json');
         arr = await res.json();
-      }catch(_){
-        if(window._PLANET_DATA && Array.isArray(window._PLANET_DATA.data)) arr = window._PLANET_DATA.data;
+      } catch (_) {
+        if (window._PLANET_DATA && Array.isArray(window._PLANET_DATA.data)) arr = window._PLANET_DATA.data;
         else throw _;
       }
-      const sample = arr.slice(0,6);
+      const sample = arr.slice(0, 6);
       grid.innerHTML = '';
       const REMOTE_PLANET_IMAGES = {
         mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
@@ -108,11 +131,11 @@ document.addEventListener('DOMContentLoaded',()=>{
         neptune: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/400px-Neptune_Full.jpg'
       };
 
-      sample.forEach(p=>{
+      sample.forEach(p => {
         const el = document.createElement('a');
         el.className = 'preview-card';
         el.href = `planet.html?id=${p.id}`;
-        const fallback = `https://placehold.co/200x200/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+        const fallback = `https://placehold.co/200x200/${p.color.replace('#', '')}/ffffff?text=${encodeURIComponent(p.name)}`;
         const thumb = REMOTE_PLANET_THUMBS[p.id] || REMOTE_PLANET_IMAGES[p.id] || fallback;
         el.innerHTML = `
           <div style="position:relative;display:flex;align-items:center;justify-content:center;height:88px;width:88px">
@@ -123,34 +146,34 @@ document.addEventListener('DOMContentLoaded',()=>{
           <div class=\"pmeta\">${p.type} • ${p.distance} млн км</div>`;
         grid.appendChild(el);
       });
-    }catch(e){
-      console.error('home preview failed',e);
+    } catch (e) {
+      console.error('home preview failed', e);
     }
   }
   loadHomePreview();
 
   // Planet of the week: choose a planet deterministically by week number
-  async function setPlanetOfWeek(){
+  async function setPlanetOfWeek() {
     const card = document.getElementById('planet-of-week');
-    if(!card) return;
-    try{
+    if (!card) return;
+    try {
       let arr;
-      try{ const r = await fetch('data/planets.json'); arr = await r.json(); }catch(_){ arr = (window._PLANET_DATA && Array.isArray(window._PLANET_DATA.data)) ? window._PLANET_DATA.data : null; }
-      if(!Array.isArray(arr) || arr.length===0) return;
+      try { const r = await fetch('data/planets.json'); arr = await r.json(); } catch (_) { arr = (window._PLANET_DATA && Array.isArray(window._PLANET_DATA.data)) ? window._PLANET_DATA.data : null; }
+      if (!Array.isArray(arr) || arr.length === 0) return;
       // compute week index: number of weeks since epoch modulo length
-      const weeks = Math.floor(Date.now() / (1000*60*60*24*7));
+      const weeks = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7));
       const idx = weeks % arr.length;
       const p = arr[idx];
       // update UI inside the card
       const pname = card.querySelector('.pname');
       const pmeta = card.querySelector('.pmeta');
       const btn = card.querySelector('.btn');
-      if(pname) pname.textContent = p.name;
-      if(pmeta) pmeta.textContent = (p.description || `${p.type} — ${p.distance} млн км`);
-      if(btn) btn.href = `planet.html?id=${p.id}`;
+      if (pname) pname.textContent = p.name;
+      if (pmeta) pmeta.textContent = (p.description || `${p.type} — ${p.distance} млн км`);
+      if (btn) btn.href = `planet.html?id=${p.id}`;
       // thumbnail: try local asset, then curated remote texture, then placeholder
       const thumb = card.querySelector('.planet-week-img');
-      if(thumb){
+      if (thumb) {
         const local = `assets/images/${p.id}.jpg`;
         const REMOTE_PLANET_THUMBS = {
           mercury: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mercury_in_true_color.jpg/800px-Mercury_in_true_color.jpg',
@@ -162,25 +185,25 @@ document.addEventListener('DOMContentLoaded',()=>{
           uranus: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Uranus2.jpg/400px-Uranus2.jpg',
           neptune: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/400px-Neptune_Full.jpg'
         };
-        const placeholder = `https://placehold.co/400x400/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+        const placeholder = `https://placehold.co/400x400/${p.color.replace('#', '')}/ffffff?text=${encodeURIComponent(p.name)}`;
         thumb.alt = p.name;
         // Try local first, then thumbnail remote, then full remote, then placeholder
         thumb.src = local;
         thumb.loading = 'lazy';
-        thumb.onerror = function handler(){
+        thumb.onerror = function handler() {
           this.onerror = null;
-          if(REMOTE_PLANET_THUMBS[p.id]){
+          if (REMOTE_PLANET_THUMBS[p.id]) {
             this.src = REMOTE_PLANET_THUMBS[p.id];
-            this.onerror = function(){ this.onerror = null; this.src = (REMOTE_PLANET_THUMBS[p.id]||placeholder); };
-          } else if (typeof REMOTE_PLANET_IMAGES !== 'undefined' && REMOTE_PLANET_IMAGES[p.id]){
+            this.onerror = function () { this.onerror = null; this.src = (REMOTE_PLANET_THUMBS[p.id] || placeholder); };
+          } else if (typeof REMOTE_PLANET_IMAGES !== 'undefined' && REMOTE_PLANET_IMAGES[p.id]) {
             this.src = REMOTE_PLANET_IMAGES[p.id];
-            this.onerror = function(){ this.onerror = null; this.src = placeholder; };
+            this.onerror = function () { this.onerror = null; this.src = placeholder; };
           } else {
             this.src = placeholder;
           }
         };
       }
-    }catch(e){ console.warn('setPlanetOfWeek failed', e); }
+    } catch (e) { console.warn('setPlanetOfWeek failed', e); }
   }
   setPlanetOfWeek();
 });
