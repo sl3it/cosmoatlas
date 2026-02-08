@@ -46,7 +46,11 @@ async function initPlanet(){
   await new Promise((resolve)=>{
     loader.load(textureUrl, tex=>{
       material.map = tex; material.needsUpdate = true; textureLoaded = true; resolve();
-    }, undefined, ()=>{resolve();});
+    }, undefined, ()=>{
+      // try remote placeholder fallback using same color and planet name
+      const fallbackUrl = `https://placehold.co/1024x1024/${(p.color||'#444').replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+      loader.load(fallbackUrl, ftex=>{ material.map = ftex; material.needsUpdate = true; textureLoaded = true; resolve(); }, undefined, ()=>{ resolve(); });
+    });
   });
 
   const mesh = new THREE.Mesh(geo, material);
@@ -72,12 +76,56 @@ async function initPlanet(){
   resize();
 
   // Simple auto-rotate and slow bob
+  // Simple auto-rotate, slow bob and interactive drag-to-rotate
   let t = 0;
+  // interactive rotation state
+  let isPointerDown = false;
+  let lastX = 0, lastY = 0;
+  let velX = 0, velY = 0; // inertia velocities
+  let userRotX = 0; // user-controlled X rotation offset
+  const sensitivity = 0.005;
+  const damping = 0.92;
+
+  // Prevent default touch actions so dragging works consistently
+  renderer.domElement.style.touchAction = 'none';
+
+  renderer.domElement.addEventListener('pointerdown', (ev)=>{
+    isPointerDown = true;
+    lastX = ev.clientX; lastY = ev.clientY;
+    try{ renderer.domElement.setPointerCapture(ev.pointerId); }catch(e){}
+  });
+  renderer.domElement.addEventListener('pointermove', (ev)=>{
+    if(!isPointerDown) return;
+    const dx = ev.clientX - lastX;
+    const dy = ev.clientY - lastY;
+    // horizontal drag rotates around Y axis, vertical adjusts X offset
+    mesh.rotation.y += dx * sensitivity;
+    userRotX += dy * sensitivity;
+    // clamp user X rotation so planet doesn't flip upside-down
+    userRotX = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, userRotX));
+    // update inertia
+    velX = dx * sensitivity;
+    velY = dy * sensitivity;
+    lastX = ev.clientX; lastY = ev.clientY;
+  });
+  function endPointer(ev){ isPointerDown = false; try{ renderer.domElement.releasePointerCapture(ev && ev.pointerId); }catch(e){} }
+  renderer.domElement.addEventListener('pointerup', endPointer);
+  renderer.domElement.addEventListener('pointercancel', endPointer);
+  renderer.domElement.addEventListener('pointerleave', ()=>{ isPointerDown = false; });
+
   function animate(){
     requestAnimationFrame(animate);
     t += 0.008;
-    mesh.rotation.y += 0.004 + (textureLoaded ? 0.002 : 0.0);
-    mesh.rotation.x = Math.sin(t) * 0.02;
+    const baseAuto = 0.004 + (textureLoaded ? 0.002 : 0.0);
+    // apply inertia when user released
+    if(!isPointerDown){
+      // apply small inertia velocities
+      if(Math.abs(velX) > 0.00001){ mesh.rotation.y += velX; velX *= damping; }
+      else { mesh.rotation.y += baseAuto; }
+      if(Math.abs(velY) > 0.00001){ userRotX += velY; velY *= damping; }
+    }
+    // gentle procedural bob + user X rotation
+    mesh.rotation.x = Math.sin(t) * 0.02 + userRotX;
     atmMesh.rotation.y = mesh.rotation.y * 0.98;
     renderer.render(scene, camera);
   }

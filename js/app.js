@@ -89,10 +89,11 @@ document.addEventListener('DOMContentLoaded',()=>{
         const el = document.createElement('a');
         el.className = 'preview-card';
         el.href = `planet.html?id=${p.id}`;
+        const fallback = `https://placehold.co/200x200/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
         el.innerHTML = `
           <div style="position:relative;display:flex;align-items:center;justify-content:center;height:88px;width:88px">
             <div class=\"bubble\" style=\"background:${p.color}\"></div>
-            <img class=\"planet-thumb small\" src=\"assets/images/${p.id}.jpg\" alt=\"${p.name}\" onerror=\"this.style.display='none'\">
+            <img class=\"planet-thumb small\" src=\"assets/images/${p.id}.jpg\" alt=\"${p.name}\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
           </div>
           <div class=\"pname\">${p.name}</div>
           <div class=\"pmeta\">${p.type} • ${p.distance} млн км</div>`;

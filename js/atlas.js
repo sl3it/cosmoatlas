@@ -6,10 +6,12 @@ function renderAtlas(list){
     const card = document.createElement('a');
     card.className = 'planet-card';
     card.href = `planet.html?id=${p.id}`;
+    // fallback image URL (generated placeholder matching planet color)
+    const fallback = `https://placehold.co/400x400/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
     card.innerHTML = `
       <div style="height:110px;display:flex;align-items:center;justify-content:center;position:relative">
         <div class=\"planet-bubble\" style=\"background:${p.color}\"></div>
-        <img class=\"planet-thumb\" src=\"assets/images/${p.id}.jpg\" alt=\"${p.name}\" onerror=\"this.style.display='none'\">
+        <img class=\"planet-thumb\" src=\"assets/images/${p.id}.jpg\" alt=\"${p.name}\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
       </div>
       <div class=\"planet-name\">${p.name}</div>
       <div class=\"planet-meta\">${p.type} • ${p.distance} млн км</div>`;
