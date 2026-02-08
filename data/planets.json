@@ -1,0 +1,10 @@
+[
+  {"id":"mercury","name":"Меркурий","type":"rocky","distance":57.9,"color":"#b8b8b8","radius":2439,"atmosphere":{"O2":0.0,"N2":0.0,"CO2":0.0,"Other":100}},
+  {"id":"venus","name":"Венера","type":"rocky","distance":108.2,"color":"#e6c27a","radius":6051,"atmosphere":{"CO2":96.5,"N2":3.5,"Other":0}},
+  {"id":"earth","name":"Земля","type":"rocky","distance":149.6,"color":"#3aa0ff","radius":6371,"atmosphere":{"N2":78.1,"O2":20.9,"Ar":0.9,"CO2":0.04}},
+  {"id":"mars","name":"Марс","type":"rocky","distance":227.9,"color":"#c1440e","radius":3389,"atmosphere":{"CO2":95.3,"N2":2.7,"Ar":1.6}},
+  {"id":"jupiter","name":"Юпитер","type":"gas giant","distance":778.3,"color":"#d9b27b","radius":69911,"atmosphere":{"H2":89.8,"He":10.2}},
+  {"id":"saturn","name":"Сатурн","type":"gas giant","distance":1427,"color":"#e3d7b5","radius":58232,"atmosphere":{"H2":96.3,"He":3.25}},
+  {"id":"uranus","name":"Уран","type":"ice giant","distance":2871,"color":"#9be6e6","radius":25362,"atmosphere":{"H2":82.5,"He":15.2,"CH4":2.3}},
+  {"id":"neptune","name":"Нептун","type":"ice giant","distance":4497.1,"color":"#2b6cff","radius":24622,"atmosphere":{"H2":80,"He":19,"CH4":1}}
+]
