@@ -5,6 +5,9 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,Segoe UI,Arial; background:linear-gradient(180deg,#020214 0%,#071024 100%); color:#e6eef6; -webkit-font-smoothing:antialiased}
 .site-header{padding:18px 24px;}
+.back-btn{position:fixed;left:18px;top:18px;width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;color:var(--accent);text-decoration:none;z-index:5;box-shadow:0 6px 18px rgba(0,0,0,0.6);transition:transform .12s,background .12s}
+.back-btn svg{width:18px;height:18px;display:block}
+.back-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,0.05)}
 .nav{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
 .logo{font-weight:700;color:var(--accent);text-decoration:none}
 .nav-links a{color:var(--muted);margin-left:18px;text-decoration:none}
