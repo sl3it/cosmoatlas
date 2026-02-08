@@ -1,22 +1,33 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Live — МКС</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 </head>
+
 <body>
-  <header class="site-header"><div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a></div></header>
+  <header class="site-header">
+    <div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a>
+    </div>
+  </header>
   <a class="back-btn" href="index.html" onclick="history.back(); return false" aria-label="Назад">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
   </a>
-  <main style="max-width:var(--max-width);margin:20px auto;padding:20px">
+  <main style="max-width:var(--max-width);margin:20px auto;padding:20px" data-aos="fade-in">
     <h1>Live-трекинг МКС</h1>
     <div id="map"></div>
   </main>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="js/iss.js"></script>
 </body>
+
 </html>

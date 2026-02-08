@@ -13,6 +13,7 @@
     <div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a>
     </div>
   </header>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
   <a class="back-btn" href="index.html" onclick="history.back(); return false" aria-label="Назад">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -45,7 +46,7 @@
         </div>
       </div>
 
-      <div class="planet-stats-grid">
+      <div class="planet-stats-grid" data-aos="fade-up" data-aos-delay="100">
         <div class="stat-card">
           <div class="stat-label">Расстояние от Солнца</div>
           <div class="stat-value" id="val-dist">—</div>
@@ -72,6 +73,8 @@
   </main>
   <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
   <script src="js/planet.js?v=2"></script>
 </body>
 

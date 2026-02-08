@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Атлас планет — CosmoAtlas</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
 </head>
 
 <body>
@@ -62,8 +63,10 @@
       </div>
     </section>
 
-    <section class="atlas-container" id="atlas"></section>
+    <section class="atlas-container" id="atlas" data-aos="fade-up"></section>
   </main>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
   <script src="js/atlas.js"></script>
 </body>
 
