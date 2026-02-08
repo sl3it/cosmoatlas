@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Планета — CosmoAtlas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header"><div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a></div></header>
+  <main>
+    <section class="planet-page">
+      <div class="viewer" id="viewer"></div>
+      <aside>
+        <h2 id="p-name">Планета</h2>
+        <p id="p-meta" class="planet-meta"></p>
+        <canvas id="atmChart" width="400" height="300"></canvas>
+        <h3>Сравнение с Землёй</h3>
+        <div class="compare">
+          <div style="flex:1">
+            <div class="size-bar" id="earth-bar"></div>
+          </div>
+          <div style="width:120px;text-align:center"><span id="size-label">—</span></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/planet.js"></script>
+</body>
+</html>

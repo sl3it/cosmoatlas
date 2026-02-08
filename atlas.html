@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Атлас планет — CosmoAtlas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header"><div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a></div></header>
+  <main>
+    <script>
+      // Inline fallback data for file:// usage — used when fetch fails in atlas.js
+      window._PLANET_DATA = 
+      {
+        "data": [
+          {"id":"mercury","name":"Меркурий","type":"rocky","distance":57.9,"color":"#b8b8b8","radius":2439,"atmosphere":{"O2":0.0,"N2":0.0,"CO2":0.0,"Other":100}},
+          {"id":"venus","name":"Венера","type":"rocky","distance":108.2,"color":"#e6c27a","radius":6051,"atmosphere":{"CO2":96.5,"N2":3.5,"Other":0}},
+          {"id":"earth","name":"Земля","type":"rocky","distance":149.6,"color":"#3aa0ff","radius":6371,"atmosphere":{"N2":78.1,"O2":20.9,"Ar":0.9,"CO2":0.04}},
+          {"id":"mars","name":"Марс","type":"rocky","distance":227.9,"color":"#c1440e","radius":3389,"atmosphere":{"CO2":95.3,"N2":2.7,"Ar":1.6}},
+          {"id":"jupiter","name":"Юпитер","type":"gas giant","distance":778.3,"color":"#d9b27b","radius":69911,"atmosphere":{"H2":89.8,"He":10.2}},
+          {"id":"saturn","name":"Сатурн","type":"gas giant","distance":1427,"color":"#e3d7b5","radius":58232,"atmosphere":{"H2":96.3,"He":3.25}},
+          {"id":"uranus","name":"Уран","type":"ice giant","distance":2871,"color":"#9be6e6","radius":25362,"atmosphere":{"H2":82.5,"He":15.2,"CH4":2.3}},
+          {"id":"neptune","name":"Нептун","type":"ice giant","distance":4497.1,"color":"#2b6cff","radius":24622,"atmosphere":{"H2":80,"He":19,"CH4":1}}
+        ]
+      };
+    </script>
+
+    <section style="max-width:var(--max-width);margin:18px auto;padding:8px 20px;">
+      <div class="atlas-controls" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <label style="color:var(--muted)">Тип:
+          <select id="filter-type">
+            <option value="all">Все</option>
+            <option value="rocky">Земная группа</option>
+            <option value="gas giant">Газовые гиганты</option>
+            <option value="ice giant">Ледяные гиганты</option>
+          </select>
+        </label>
+
+        <label style="color:var(--muted)">Сортировка:
+          <select id="sort-by">
+            <option value="distance-asc">По удалению: ближе → дальше</option>
+            <option value="distance-desc">По удалению: дальше → ближе</option>
+            <option value="name-asc">По имени A→Z</option>
+          </select>
+        </label>
+
+        <label style="color:var(--muted);margin-left:auto">Поиск:
+          <input id="search" placeholder="Имя планеты" style="padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+        </label>
+      </div>
+    </section>
+
+    <section class="atlas-container" id="atlas"></section>
+  </main>
+  <script src="js/atlas.js"></script>
+</body>
+</html>

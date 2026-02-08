@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>CosmoAtlas — Learn the planets</title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+</head>
+<body>
+	<!-- Particles background container (particles.js) -->
+	<div id="particles-js" aria-hidden="true"></div>
+	<header class="site-header">
+		<nav class="nav">
+			<a class="logo" href="index.html">CosmoAtlas</a>
+			<div class="nav-links">
+				<a href="atlas.html">Атлас планет</a>
+				<a href="iss.html">Live: МКС</a>
+			</div>
+		</nav>
+	</header>
+
+	<main>
+		<section class="hero">
+			<video id="hero-video" class="hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=1950&q=80" aria-hidden="true">
+				<!-- Replace the src below with any remote MP4 URL for a space video -->
+				<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+				Ваш браузер не поддерживает видео.
+			</video>
+			<div class="hero-inner">
+				<h1>Исследуй планеты</h1>
+				<p>3D-модели, атмосферы, сравнения и live-трекинг МКС.</p>
+				<div class="hero-cta">
+					<a class="btn" href="atlas.html">Открыть атлас</a>
+					<a class="btn ghost" href="iss.html">Отследить МКС</a>
+				</div>
+			</div>
+			<div class="apod" id="apod" data-aos="fade-up">
+				<div id="apod-inner">Загрузка Photo of the Day...</div>
+			</div>
+		</section>
+
+
+
+		<section class="about" data-aos="fade-up">
+			<h2>О проекте</h2>
+			<p>CosmoAtlas — небольшой образовательный проект, посвящённый планетам Солнечной системы и космическим наблюдениям. Здесь вы найдёте 3D-визуализации, сравнения планет, актуальные данные и live-трекинг МКС.</p>
+			<div class="highlights">
+				<div class="card" id="planet-of-week">
+					<div class="card-title">Планета недели</div>
+					<div class="card-body">
+						<div class="pname">Марс</div>
+						<div class="pmeta">Красная планета — исследования, роверы и следы воды.</div>
+						<a href="planet.html" class="btn" style="margin-top:10px;display:inline-block">Подробнее</a>
+					</div>
+				</div>
+				<div class="card" id="apod-preview">
+					<div class="card-title">Photo of the Day</div>
+					<div class="card-body">Загрузка изображения...</div>
+				</div>
+				<div class="card" id="quick-stats">
+					<div class="card-title">Быстрые факты</div>
+					<div class="card-body">
+						<ul class="stats">
+							<li><strong>8</strong> планет в Солнечной системе</li>
+							<li><strong>5</strong> видимых планет невооружённым глазом</li>
+							<li><strong>1</strong> активная МКС — live-трекинг</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="home-preview" id="home-preview" data-aos="fade-up">
+			<h2 style="max-width:var(--max-width);margin:12px auto 8px;padding:0 20px">Обзор атласа</h2>
+			<div id="preview-grid" class="atlas-container" style="max-width:var(--max-width);margin:0 auto;padding:0 20px"></div>
+			<div style="max-width:var(--max-width);margin:12px auto;padding:0 20px;text-align:center"><a class="btn" href="atlas.html">Открыть атлас</a></div>
+		</section>
+	</main>
+
+	<footer class="site-footer">© CosmoAtlas — Demo project</footer>
+
+
+	<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+	<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+	<!-- Particles.js library and configuration -->
+	<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+	<script>
+		/* Initialize particles.js on the #particles-js element */
+		particlesJS('particles-js', {
+		  "particles": {
+		    "number": {"value": 70, "density": {"enable": true, "value_area": 800}},
+		    "color": {"value": "#ffffff"},
+		    "shape": {"type": "circle"},
+		    "opacity": {"value": 0.7, "random": true},
+		    "size": {"value": 3, "random": true},
+		    "line_linked": {"enable": true, "distance": 140, "color": "#66fff0", "opacity": 0.08, "width": 1},
+		    "move": {"enable": true, "speed": 1.5, "direction": "none", "random": false, "straight": false, "out_mode": "out"}
+		  },
+		  "interactivity": {
+		    "detect_on": "canvas",
+		    "events": {"onhover": {"enable": true, "mode": "grab"}, "onclick": {"enable": true, "mode": "push"}, "resize": true},
+		    "modes": {"grab": {"distance": 140, "line_linked": {"opacity": 0.2}}, "bubble": {"distance": 200, "size": 8, "duration": 2, "opacity": 0.8}, "repulse": {"distance": 100}, "push": {"particles_nb": 4}}
+		  },
+		  "retina_detect": true
+		});
+	</script>
+	<script src="js/app.js"></script>
+</body>
+</html>
