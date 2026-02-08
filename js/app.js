@@ -85,15 +85,26 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
       const sample = arr.slice(0,6);
       grid.innerHTML = '';
+      const REMOTE_PLANET_IMAGES = {
+        mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
+        venus: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg',
+        earth: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg',
+        mars: 'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
+        jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
+        saturn: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg',
+        uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
+        neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
+      };
       sample.forEach(p=>{
         const el = document.createElement('a');
         el.className = 'preview-card';
         el.href = `planet.html?id=${p.id}`;
         const fallback = `https://placehold.co/200x200/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+        const remote = REMOTE_PLANET_IMAGES[p.id] || fallback;
         el.innerHTML = `
           <div style="position:relative;display:flex;align-items:center;justify-content:center;height:88px;width:88px">
             <div class=\"bubble\" style=\"background:${p.color}\"></div>
-            <img class=\"planet-thumb small\" src=\"assets/images/${p.id}.jpg\" alt=\"${p.name}\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
+            <img class=\"planet-thumb small\" src=\"${remote}\" alt=\"${p.name}\" data-fallback=\"${fallback}\" onerror=\"this.onerror=null;this.src=this.dataset.fallback\">
           </div>
           <div class=\"pname\">${p.name}</div>
           <div class=\"pmeta\">${p.type} • ${p.distance} млн км</div>`;
@@ -104,6 +115,57 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   }
   loadHomePreview();
+
+  // Planet of the week: choose a planet deterministically by week number
+  async function setPlanetOfWeek(){
+    const card = document.getElementById('planet-of-week');
+    if(!card) return;
+    try{
+      let arr;
+      try{ const r = await fetch('data/planets.json'); arr = await r.json(); }catch(_){ arr = (window._PLANET_DATA && Array.isArray(window._PLANET_DATA.data)) ? window._PLANET_DATA.data : null; }
+      if(!Array.isArray(arr) || arr.length===0) return;
+      // compute week index: number of weeks since epoch modulo length
+      const weeks = Math.floor(Date.now() / (1000*60*60*24*7));
+      const idx = weeks % arr.length;
+      const p = arr[idx];
+      // update UI inside the card
+      const pname = card.querySelector('.pname');
+      const pmeta = card.querySelector('.pmeta');
+      const btn = card.querySelector('.btn');
+      if(pname) pname.textContent = p.name;
+      if(pmeta) pmeta.textContent = (p.description || `${p.type} — ${p.distance} млн км`);
+      if(btn) btn.href = `planet.html?id=${p.id}`;
+      // thumbnail: try local asset, then curated remote texture, then placeholder
+      const thumb = card.querySelector('.planet-week-img');
+      if(thumb){
+        const local = `assets/images/${p.id}.jpg`;
+        const remoteMap = {
+          mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
+          venus: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg',
+          earth: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg',
+          mars: 'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
+          jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
+          saturn: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg',
+          uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
+          neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
+        };
+        const placeholder = `https://placehold.co/400x400/${p.color.replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+        thumb.alt = p.name;
+        // first try local, on error try remoteMap, then placeholder
+        thumb.src = local;
+        thumb.onerror = function handler(){
+          this.onerror = null;
+          if(remoteMap[p.id]){
+            this.src = remoteMap[p.id];
+            this.onerror = function(){ this.onerror = null; this.src = placeholder; };
+          } else {
+            this.src = placeholder;
+          }
+        };
+      }
+    }catch(e){ console.warn('setPlanetOfWeek failed', e); }
+  }
+  setPlanetOfWeek();
 });
 
 

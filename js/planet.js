@@ -35,23 +35,48 @@ async function initPlanet(){
   const dir = new THREE.DirectionalLight(0xffffff, 1.0);
   dir.position.set(5, 3, 5);
   scene.add(dir);
+  // small point light for specular highlight
+  const point = new THREE.PointLight(0xffffff, 0.6);
+  point.position.set(3, 1.6, 2.5);
+  scene.add(point);
 
   // Planet mesh with optional texture
   const geo = new THREE.SphereGeometry(1, 64, 64);
   const loader = new THREE.TextureLoader();
-  let material = new THREE.MeshStandardMaterial({color: p.color || '#888', metalness:0.1, roughness:0.8});
-  // try load texture from assets/textures/{id}.jpg if present
-  const textureUrl = `assets/textures/${p.id}.jpg`;
+  renderer.physicallyCorrectLights = true;
+  let material = new THREE.MeshStandardMaterial({color: p.color || '#888', metalness:0.0, roughness:0.7});
+  // prepare candidate texture URLs: prefer curated remote textures, then placeholder (no local files required)
+  const remoteMap = {
+    earth: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Earth_Eastern_Hemisphere.jpg',
+    mars: 'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg',
+    jupiter: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg',
+    saturn: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg',
+    mercury: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Mercury_in_true_color.jpg',
+    venus: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg',
+    uranus: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg',
+    neptune: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg'
+  };
+  const placeholder = `https://placehold.co/1024x1024/${(p.color||'#444').replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
+  const candidates = [];
+  if(remoteMap[p.id]) candidates.push(remoteMap[p.id]);
+  candidates.push(placeholder);
+
   let textureLoaded = false;
-  await new Promise((resolve)=>{
-    loader.load(textureUrl, tex=>{
-      material.map = tex; material.needsUpdate = true; textureLoaded = true; resolve();
-    }, undefined, ()=>{
-      // try remote placeholder fallback using same color and planet name
-      const fallbackUrl = `https://placehold.co/1024x1024/${(p.color||'#444').replace('#','')}/ffffff?text=${encodeURIComponent(p.name)}`;
-      loader.load(fallbackUrl, ftex=>{ material.map = ftex; material.needsUpdate = true; textureLoaded = true; resolve(); }, undefined, ()=>{ resolve(); });
-    });
-  });
+  async function tryLoadList(list){
+    for(const url of list){
+      try{
+        const tex = await new Promise((resolve, reject)=>{
+          loader.load(url, resolve, undefined, reject);
+        });
+        return tex;
+      }catch(e){
+        // try next
+      }
+    }
+    return null;
+  }
+  const tex = await tryLoadList(candidates);
+  if(tex){ material.map = tex; material.needsUpdate = true; textureLoaded = true; }
 
   const mesh = new THREE.Mesh(geo, material);
   scene.add(mesh);
