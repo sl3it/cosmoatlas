@@ -224,7 +224,7 @@ a.btn:not(.ghost) {
 a.btn:not(.ghost):hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(78, 240, 217, 0.4);
-  background: #5ffadfa;
+  background: #5ffadf;
 }
 
 /* Secondary Button */
@@ -307,13 +307,7 @@ main,
   gap: 18px
 }
 
-.planet-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
-  padding: 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform .18s, box-shadow .18s
-}
+
 
 .planet-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
@@ -462,17 +456,7 @@ main,
   align-items: center
 }
 
-.size-bar {
-  height: 18px;
-  background: linear-gradient(90deg, #0b1220, #122031);
-  border-radius: 12px;
-  transition: width 900ms cubic-bezier(.2, .9, .2, 1);
-  width: 8%
-}
 
-.size-bar.animated {
-  box-shadow: 0 8px 30px rgba(58, 160, 255, 0.08), inset 0 -6px 16px rgba(0, 0, 0, 0.2)
-}
 
 /* Planet viewer specifics */
 
