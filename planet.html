@@ -1,15 +1,22 @@
 <!doctype html>
 <html lang="ru">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Планета — CosmoAtlas</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <header class="site-header"><div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a></div></header>
+  <header class="site-header">
+    <div class="nav" style="max-width:var(--max-width);margin:0 auto"><a class="logo" href="index.html">CosmoAtlas</a>
+    </div>
+  </header>
   <a class="back-btn" href="index.html" onclick="history.back(); return false" aria-label="Назад">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
   </a>
   <main>
     <section class="planet-page">
@@ -28,8 +35,8 @@
       </aside>
     </section>
   </main>
-  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="js/planet.js"></script>
 </body>
+
 </html>
